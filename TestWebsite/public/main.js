@@ -8,36 +8,36 @@ document.addEventListener('DOMContentLoaded', () => {
   const errorDiv = document.getElementById('errorMessage');
   const successDiv = document.getElementById('successMessage');
 
-  let currentUser = null;
+  window.currentUser = null;
+
 
   const API_BASE = 'http://localhost:5000/api';
 
   // ========== PAGE TRACKING ==========
   function trackPageView(pageName, pageTitle) {
+
+    if (pageName === 'login' || pageName === 'signup') return;
+    
     if (typeof gtag === 'function') {
       gtag('config', 'G-C230G3H2P6', {
         page_title: pageTitle,
-        page_location: window.location.origin + '/' + pageName
-      });
-      
-      gtag('event', 'page_view', {
-        page_title: pageTitle,
         page_location: window.location.origin + '/' + pageName,
-        custom_page_name: pageName
+        user_id: currentUser?.email || undefined
       });
+      // Removed the manual gtag('event', 'page_view')
     }
-    
-    // Update browser URL without page reload
     history.pushState(null, pageTitle, '/' + pageName);
     document.title = `${pageTitle} - TechVision Solutions`;
   }
+
 
   // ========== AUTH STATE ==========
   function checkAuthState() {
     const savedUser = sessionStorage.getItem('currentUser');
     if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      currentUser = parsedUser;
+      currentUser = JSON.parse(savedUser);
+      // Add this line
+      window.currentUser = currentUser;
       showMainApp();
     }
   }
@@ -146,6 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       currentUser = data.user;
       sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+      window.currentUser = currentUser; // Add this line
+
       showSuccess('Login successful!');
       showMainApp();
     } catch (err) {
@@ -271,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Track specific events for important pages
       if (typeof gtag === 'function') {
-        switch(page) {
+        switch (page) {
           case 'services':
             gtag('event', 'view_item_list', {
               item_list_name: 'Services',
