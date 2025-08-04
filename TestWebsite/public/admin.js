@@ -1,13 +1,27 @@
+// admin.js — updated
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('adminLoginForm');
-  const errorDiv = document.getElementById('adminError');
+  const emailInput = document.getElementById('adminEmail');
+  const passInput  = document.getElementById('adminPassword');
+  const errorDiv   = document.getElementById('adminError');
+  const submitBtn  = form.querySelector('.auth-button');
+
   const API_BASE = 'http://localhost:5000/api';
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById('adminEmail').value.trim();
-    const password = document.getElementById('adminPassword').value;
+    // Clear previous error
+    hideError();
+
+    const email = emailInput.value.trim();
+    const password = passInput.value;
+
+    if (!email || !password) {
+      return showError('Please enter your admin email and password.');
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch(`${API_BASE}/login`, {
@@ -16,20 +30,51 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ email, password })
       });
 
-      const data = await res.json();
-      if (!res.ok) return showError(data.message);
-      if (!data.user.isAdmin) return showError('Access denied: Not an admin');
+      const data = await res.json().catch(() => ({}));
 
+      if (!res.ok) {
+        showError(data?.message || 'Login failed.');
+        setLoading(false);
+        return;
+      }
+
+      // Must be an admin account (as issued by the backend)
+      if (!data?.user?.isAdmin) {
+        showError('Access denied: Not an admin');
+        setLoading(false);
+        return;
+      }
+
+      // Save both user and JWT for subsequent admin-only API calls
       sessionStorage.setItem('currentUser', JSON.stringify(data.user));
-      window.location.href = 'index.html'; // load main dashboard
-    } catch {
+      sessionStorage.setItem('jwt', data.token);
+
+      // Go to the main app
+      window.location.href = 'index.html';
+    } catch (err) {
       showError('Login failed. Server error.');
+      setLoading(false);
     }
   });
 
+  function setLoading(isLoading) {
+    if (!submitBtn) return;
+    submitBtn.disabled = isLoading;
+    submitBtn.innerHTML = isLoading ? '<div class="loading"></div> Signing In…' : 'Admin Sign In';
+  }
+
   function showError(msg) {
+    if (!errorDiv) {
+      alert(msg);
+      return;
+    }
     errorDiv.textContent = msg;
     errorDiv.classList.remove('hidden');
-    setTimeout(() => errorDiv.classList.add('hidden'), 4000);
+  }
+
+  function hideError() {
+    if (!errorDiv) return;
+    errorDiv.textContent = '';
+    errorDiv.classList.add('hidden');
   }
 });

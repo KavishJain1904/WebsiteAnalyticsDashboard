@@ -49,8 +49,9 @@
                     <a href="#" class="auth-link" onclick="showSignup()">Create Account</a>
                     <a href="#" class="auth-link" onclick="showForgotPassword()">Forgot Password?</a>
                     <a href="admin.html" class="auth-link">Admin Login</a>
-
+                    <a href="#" class="auth-link" onclick="continueAsGuest()">← Continue as Guest</a>
                 </div>
+
             </form>
 
             <!-- Signup Form -->
@@ -105,7 +106,6 @@
 
     <!-- Main Application (Hidden initially) -->
     <div class="main-app" id="mainApp">
-        <!-- Navigation -->
         <nav>
             <div class="container">
                 <div class="nav-container">
@@ -119,12 +119,21 @@
                         <li><a href="#" class="nav-link" data-page="blog">Blog</a></li>
                         <li><a href="#" class="nav-link" data-page="adminPanel" id="adminLink"
                                 style="display: none;">Admin Panel</a></li>
-                        <li class="user-info">
+
+
+                        <!-- 👇 New: Only shows when not logged in -->
+                        <li id="loginNav" style="display: none;">
+                            <button class="cta-button" onclick="showLoginForm()">Login / Sign Up</button>
+                        </li>
+
+                        <!-- 👇 Shows only when logged in -->
+                        <li class="user-info" style="display: none;">
                             <div class="user-avatar" id="userAvatar"></div>
                             <span id="userName"></span>
                             <button class="logout-btn" onclick="logout()">Logout</button>
                         </li>
                     </ul>
+
                     <button class="hamburger" onclick="toggleMenu()">
                         <span></span>
                         <span></span>
@@ -286,17 +295,19 @@
                 </div>
             </div>
 
-            <!-- Admin Panel -->
             <div class="page-content" id="adminPanel" data-editable="true">
                 <h2>Admin Control Panel</h2>
                 <p>Welcome, Admin! You have full access to manage website content.</p>
-                <p>You can edit all page content by enabling edit mode below.</p>
-
-                <!-- ✅ Controls -->
-                <button id="editToggleBtn" class="cta-button" onclick="toggleEditing()">Enable Editing</button>
-                <button id="saveChangesBtn" class="cta-button" style="display:none;" onclick="saveChanges()">Save
-                    Changes</button>
+                <p>
+                    You can edit all page content by using the <strong>Content Editor</strong> from the navigation bar.
+                </p>
+                <!-- Add this link here -->
+                <p>
+                    <a href="admin-editor.html">🛠️ Open Content Editor</a>
+                </p>
             </div>
+
+
         </main>
 
 
