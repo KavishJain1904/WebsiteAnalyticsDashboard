@@ -28,12 +28,10 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // ✅ Check if this is the admin login attempt
     if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
       const payload = {
         name: 'Admin',
@@ -48,7 +46,6 @@ router.post('/login', async (req, res) => {
       return res.json({ token, user: payload });
     }
 
-    // Normal user login
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
@@ -72,8 +69,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-
-// Forgot Password (mock)
 router.post('/forgot', async (req, res) => {
   const { email } = req.body;
   try {
@@ -85,7 +80,6 @@ router.post('/forgot', async (req, res) => {
   }
 });
 
-// Protected Route Example
 router.get('/protected', verifyToken, (req, res) => {
   res.json({ message: 'Protected route success', user: req.user });
 });

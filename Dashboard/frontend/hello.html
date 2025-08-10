@@ -162,14 +162,12 @@
                         return;
                     }
 
-                    // Group and deduplicate pages
                     const pageGroups = {};
 
                     data.rows.forEach(row => {
                         const title = row.dimensionValues?.[0]?.value || 'Untitled';
                         const users = parseInt(row.metricValues?.[0]?.value || 0);
 
-                        // Extract base page name (remove " - TechVision Solutions" suffix)
                         const baseName = title.replace(/ - TechVision Solutions$/, '').trim();
 
                         if (pageGroups[baseName]) {
@@ -190,7 +188,6 @@
                     <tbody>
             `;
 
-                    // Sort by user count and display
                     Object.entries(pageGroups)
                         .sort((a, b) => b[1] - a[1])
                         .forEach(([pageName, userCount]) => {

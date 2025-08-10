@@ -1,4 +1,3 @@
-// admin.js — updated
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('adminLoginForm');
   const emailInput = document.getElementById('adminEmail');
@@ -11,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // Clear previous error
     hideError();
 
     const email = emailInput.value.trim();
@@ -38,18 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Must be an admin account (as issued by the backend)
       if (!data?.user?.isAdmin) {
         showError('Access denied: Not an admin');
         setLoading(false);
         return;
       }
 
-      // Save both user and JWT for subsequent admin-only API calls
       sessionStorage.setItem('currentUser', JSON.stringify(data.user));
       sessionStorage.setItem('jwt', data.token);
 
-      // Go to the main app
       window.location.href = 'index.html';
     } catch (err) {
       showError('Login failed. Server error.');

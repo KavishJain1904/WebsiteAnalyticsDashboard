@@ -352,14 +352,12 @@
         console.error('Error parsing current user:', e);
       }
 
-      // Check if user is admin
       if (!jwt || !currentUser?.isAdmin) {
         alert('Access denied. Admin login required.');
         window.location.href = 'admin.html';
         return;
       }
 
-      // Load section content
       async function loadSection(id) {
         try {
           htmlEditor.placeholder = "Loading content...";
@@ -396,11 +394,8 @@
         }
       }
 
-      // Save section content
       async function saveSection(id) {
         const html = htmlEditor.value.trim();
-        
-        // Allow empty content if user wants to clear a section
         
         const headers = {
           'Content-Type': 'application/json',
@@ -438,7 +433,6 @@
         }
       }
 
-      // Get friendly section name
       function getSectionName(id) {
         const names = {
           dashboard: 'Dashboard',
@@ -452,7 +446,6 @@
         return names[id] || id;
       }
 
-      // Update live preview
       function updatePreview() {
         const html = htmlEditor.value.trim();
         if (html) {
@@ -462,7 +455,6 @@
         }
       }
 
-      // Show message
       function showMessage(msg, isError = false) {
         msgDiv.textContent = msg;
         msgDiv.className = isError ? 'message error-message' : 'message success-message';
@@ -473,7 +465,6 @@
         }, 5000);
       }
 
-      // Event listeners
       sectionSelect.addEventListener('change', () => {
         loadSection(sectionSelect.value);
       });
@@ -486,7 +477,6 @@
         updatePreview();
       });
 
-      // Keyboard shortcut for save (Ctrl+S)
       document.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.key === 's') {
           e.preventDefault();
@@ -494,7 +484,6 @@
         }
       });
 
-      // Logout function
       window.logout = function() {
         if (confirm('Are you sure you want to logout?')) {
           sessionStorage.removeItem('jwt');
@@ -503,7 +492,6 @@
         }
       };
 
-      // Load the first section on page load
       loadSection(sectionSelect.value);
     });
   </script>

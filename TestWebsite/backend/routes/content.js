@@ -1,8 +1,6 @@
-// routes/content.js
 const express = require('express');
 const router = express.Router();
 
-// In-memory storage for content (you can replace this with MongoDB later)
 let contentStorage = {
   dashboard: `<div class="hero">
     <h1>Welcome to Your Dashboard</h1>
@@ -138,20 +136,12 @@ let contentStorage = {
 </p>`
 };
 
-// Middleware to verify admin access
 const verifyAdmin = (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
     }
-
-    // You should implement proper JWT verification here
-    // For now, we'll just check if token exists
-    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // if (!decoded.isAdmin) {
-    //   return res.status(403).json({ message: 'Admin access required' });
-    // }
     
     next();
   } catch (error) {
@@ -159,7 +149,6 @@ const verifyAdmin = (req, res, next) => {
   }
 };
 
-// GET /api/content/:sectionId - Get content for a section
 router.get('/content/:sectionId', (req, res) => {
   try {
     const { sectionId } = req.params;
@@ -179,7 +168,6 @@ router.get('/content/:sectionId', (req, res) => {
   }
 });
 
-// PUT /api/content/:sectionId - Update content for a section (Admin only)
 router.put('/content/:sectionId', verifyAdmin, (req, res) => {
   try {
     const { sectionId } = req.params;
@@ -192,7 +180,6 @@ router.put('/content/:sectionId', verifyAdmin, (req, res) => {
       });
     }
 
-    // Update the content in storage
     contentStorage[sectionId] = html;
     
     res.json({ 
@@ -209,7 +196,6 @@ router.put('/content/:sectionId', verifyAdmin, (req, res) => {
   }
 });
 
-// GET /api/content - Get all content sections (Admin only)
 router.get('/content', verifyAdmin, (req, res) => {
   try {
     res.json({ 

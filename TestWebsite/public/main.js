@@ -1,4 +1,3 @@
-// main.js — FINAL VERSION (with editing functionality fully removed)
 document.addEventListener('DOMContentLoaded', () => {
   const authContainer = document.getElementById('authContainer');
   const mainApp = document.getElementById('mainApp');

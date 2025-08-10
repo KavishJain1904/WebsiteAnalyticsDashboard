@@ -20,7 +20,6 @@ body {
     padding: 0 20px;
 }
 
-/* Authentication Styles */
 .auth-container {
     display: flex;
     justify-content: center;
@@ -180,7 +179,6 @@ body {
     text-align: left;
 }
 
-/* Main App Styles (Hidden by default) */
 .main-app {
     display: none;
 }
@@ -189,7 +187,6 @@ body {
     display: block;
 }
 
-/* Navigation */
 nav {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
@@ -294,7 +291,6 @@ nav {
     border-radius: 2px;
 }
 
-/* Main Content */
 main {
     min-height: calc(100vh - 200px);
     padding: 2rem 0;
@@ -405,7 +401,6 @@ p {
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
-/* Services Grid */
 .services-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -435,7 +430,6 @@ p {
     color: #4f46e5;
 }
 
-/* Contact Form */
 .contact-form {
     max-width: 600px;
     margin: 0 auto;
@@ -476,7 +470,6 @@ p {
     font-size: 0.875rem;
 }
 
-/* Footer */
 footer {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
@@ -487,7 +480,6 @@ footer {
     border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .nav-links {
         display: none;
@@ -551,7 +543,6 @@ footer {
     display: none;
 }
 
-/* Loading Animation */
 .loading {
     display: inline-block;
     width: 18px;

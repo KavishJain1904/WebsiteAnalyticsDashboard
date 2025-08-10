@@ -39,7 +39,6 @@ app.get('/realtime', async (req, res) => {
     }
 });
 
-// ========== REALTIME DATA BY PAGE ==========
 app.get('/realtime-pages', async (req, res) => {
     try {
         const authClient = await auth.getClient();
@@ -58,7 +57,6 @@ app.get('/realtime-pages', async (req, res) => {
     } catch (error) {
         console.error('Error fetching realtime page analytics:', error);
 
-        // Send proper JSON instead of plain text
         res.status(500).json({
             error: 'Failed to fetch realtime page data',
             details: error.message || error
@@ -66,8 +64,6 @@ app.get('/realtime-pages', async (req, res) => {
     }
 });
 
-
-// ========== PAGE VIEWS HISTORICAL DATA ==========
 app.get('/page-views', async (req, res) => {
     try {
         const authClient = await auth.getClient();
@@ -103,16 +99,12 @@ app.get('/page-views', async (req, res) => {
         res.status(500).send('Failed to fetch page views data');
     }
 });
-
-// ========== COMBINED DASHBOARD DATA ==========
 app.get('/dashboard-data', async (req, res) => {
     try {
         const authClient = await auth.getClient();
         const { startDate = '7daysAgo', endDate = 'today' } = req.query;
 
-        // Fetch multiple reports concurrently
         const [realtimeCountry, realtimePages, historicalPages, topEvents] = await Promise.all([
-            // Realtime by country
             analyticsData.properties.runRealtimeReport({
                 property: `properties/${propertyId}`,
                 auth: authClient,
@@ -122,7 +114,6 @@ app.get('/dashboard-data', async (req, res) => {
                 }
             }),
 
-            // Realtime by pages
             analyticsData.properties.runRealtimeReport({
                 property: `properties/${propertyId}`,
                 auth: authClient,
@@ -132,7 +123,6 @@ app.get('/dashboard-data', async (req, res) => {
                 }
             }),
 
-            // Historical page data
             analyticsData.properties.runReport({
                 property: `properties/${propertyId}`,
                 auth: authClient,
@@ -144,7 +134,6 @@ app.get('/dashboard-data', async (req, res) => {
                 }
             }),
 
-            // Top events
             analyticsData.properties.runReport({
                 property: `properties/${propertyId}`,
                 auth: authClient,
@@ -173,7 +162,6 @@ app.get('/dashboard-data', async (req, res) => {
     }
 });
 
-// ========== PAGE PERFORMANCE METRICS ==========
 app.get('/page-performance', async (req, res) => {
     try {
         const authClient = await auth.getClient();
