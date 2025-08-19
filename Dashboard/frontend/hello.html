@@ -154,6 +154,7 @@
         function fetchRealtimePages() {
             const container = document.getElementById('realtimePages');
             container.innerHTML = '<div class="loading">Fetching latest page data...</div>';
+
             fetch('http://localhost:3000/realtime-pages')
                 .then(response => response.json())
                 .then(data => {
@@ -162,39 +163,30 @@
                         return;
                     }
 
-                    const pageGroups = {};
-
-                    data.rows.forEach(row => {
-                        const title = row.dimensionValues?.[0]?.value || 'Untitled';
-                        const users = parseInt(row.metricValues?.[0]?.value || 0);
-
-                        const baseName = title.replace(/ - TechVision Solutions$/, '').trim();
-
-                        if (pageGroups[baseName]) {
-                            pageGroups[baseName] += users;
-                        } else {
-                            pageGroups[baseName] = users;
-                        }
-                    });
-
                     let tableHTML = `
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Screen Name</th>
+                            <th>Page</th>
                             <th>Active Users</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
-                    Object.entries(pageGroups)
-                        .sort((a, b) => b[1] - a[1])
-                        .forEach(([pageName, userCount]) => {
+                    data.rows
+                        .sort((a, b) => parseInt(b.metricValues?.[0]?.value || 0) - parseInt(a.metricValues?.[0]?.value || 0))
+                        .forEach(row => {
+                            const screenName = row.dimensionValues?.[0]?.value || 'Unknown Page';
+                            const users = row.metricValues?.[0]?.value || '0';
+
+                            // If GA sends "(not set)" replace with Homepage
+                            const displayName = screenName === '(not set)' ? 'Homepage' : screenName;
+
                             tableHTML += `
                         <tr>
-                            <td>${pageName}</td>
-                            <td class="users-count">${userCount}</td>
+                            <td title="${screenName}">${displayName}</td>
+                            <td class="users-count">${users}</td>
                         </tr>
                     `;
                         });

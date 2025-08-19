@@ -158,6 +158,73 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  signupForm && signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('confirmPassword').value;
+
+    if (password !== confirm) {
+      return showError('Passwords do not match.');
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Signup failed');
+
+      showSuccess('Account created. Please log in.');
+      showLogin(); // Switch back to login form
+    } catch (err) {
+      showError(err.message);
+    }
+  });
+
+  forgotForm && forgotForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('forgotEmail').value.trim();
+
+    try {
+      const res = await fetch(`${API_BASE}/forgot`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Reset failed');
+
+      showSuccess(data.message || 'Password reset email sent (simulated).');
+      showLogin();
+    } catch (err) {
+      showError(err.message);
+    }
+  });
+
+  function showSignup() {
+    if (!loginForm || !signupForm || !forgotForm) return;
+    loginForm.classList.add('hidden');
+    signupForm.classList.remove('hidden');
+    forgotForm.classList.add('hidden');
+  }
+
+  function showForgotPassword() {
+    if (!loginForm || !signupForm || !forgotForm) return;
+    loginForm.classList.add('hidden');
+    signupForm.classList.add('hidden');
+    forgotForm.classList.remove('hidden');
+  }
+
+  window.showSignup = showSignup;
+  window.showForgotPassword = showForgotPassword;
+
+
   window.showLoginForm = function () {
     authContainer && (authContainer.style.display = '');
     showLogin();

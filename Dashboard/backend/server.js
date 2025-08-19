@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { google } = require('googleapis');
+
 const app = express();
 const port = 3000;
 
@@ -12,7 +13,7 @@ const key = require('./service-account.json');
 
 const auth = new google.auth.GoogleAuth({
     credentials: key,
-    scopes: 'https://www.googleapis.com/auth/analytics.readonly'
+    scopes: 'https://www.googleapis.com/auth/analytics.readonly',
 });
 
 const propertyId = '495329912';
@@ -21,7 +22,6 @@ const propertyId = '495329912';
 app.get('/realtime', async (req, res) => {
     try {
         const authClient = await auth.getClient();
-
         const response = await analyticsData.properties.runRealtimeReport({
             property: `properties/${propertyId}`,
             auth: authClient,
@@ -30,7 +30,6 @@ app.get('/realtime', async (req, res) => {
                 metrics: [{ name: 'activeUsers' }]
             }
         });
-
         res.json(response.data || {});
         console.log('Realtime data sent:', response.data);
     } catch (error) {
@@ -42,33 +41,31 @@ app.get('/realtime', async (req, res) => {
 app.get('/realtime-pages', async (req, res) => {
     try {
         const authClient = await auth.getClient();
-
         const response = await analyticsData.properties.runRealtimeReport({
             property: `properties/${propertyId}`,
             auth: authClient,
             requestBody: {
-               dimensions: [{ name: 'unifiedScreenName' }],
+                dimensions: [{ name: 'unifiedScreenName' }],
                 metrics: [{ name: 'activeUsers' }]
             }
         });
-
         res.json(response.data || {});
         console.log('Realtime page data sent:', response.data);
     } catch (error) {
         console.error('Error fetching realtime page analytics:', error);
-
         res.status(500).json({
             error: 'Failed to fetch realtime page data',
-            details: error.message || error
+            details: error.message
         });
     }
 });
 
+
+// ========== HISTORICAL PAGE VIEWS ==========
 app.get('/page-views', async (req, res) => {
     try {
         const authClient = await auth.getClient();
         const { startDate = '7daysAgo', endDate = 'today' } = req.query;
-
         const response = await analyticsData.properties.runReport({
             property: `properties/${propertyId}`,
             auth: authClient,
@@ -84,14 +81,10 @@ app.get('/page-views', async (req, res) => {
                     { name: 'activeUsers' }
                 ],
                 orderBys: [
-                    {
-                        metric: { metricName: 'screenPageViews' },
-                        desc: true
-                    }
+                    { metric: { metricName: 'screenPageViews' }, desc: true }
                 ]
             }
         });
-
         res.json(response.data || {});
         console.log('Page views data sent');
     } catch (error) {
@@ -99,11 +92,12 @@ app.get('/page-views', async (req, res) => {
         res.status(500).send('Failed to fetch page views data');
     }
 });
+
+// ========== DASHBOARD DATA (AGGREGATED) ==========
 app.get('/dashboard-data', async (req, res) => {
     try {
         const authClient = await auth.getClient();
         const { startDate = '7daysAgo', endDate = 'today' } = req.query;
-
         const [realtimeCountry, realtimePages, historicalPages, topEvents] = await Promise.all([
             analyticsData.properties.runRealtimeReport({
                 property: `properties/${propertyId}`,
@@ -113,27 +107,35 @@ app.get('/dashboard-data', async (req, res) => {
                     metrics: [{ name: 'activeUsers' }]
                 }
             }),
-
             analyticsData.properties.runRealtimeReport({
                 property: `properties/${propertyId}`,
                 auth: authClient,
                 requestBody: {
-                    dimensions: [{ name: 'pagePath' }, { name: 'pageTitle' }],
+                    dimensions: [
+                        { name: 'pagePath' },
+                        { name: 'pageTitle' }
+                    ],
                     metrics: [{ name: 'activeUsers' }]
                 }
             }),
-
             analyticsData.properties.runReport({
                 property: `properties/${propertyId}`,
                 auth: authClient,
                 requestBody: {
                     dateRanges: [{ startDate, endDate }],
-                    dimensions: [{ name: 'pagePath' }, { name: 'pageTitle' }],
-                    metrics: [{ name: 'screenPageViews' }, { name: 'sessions' }],
-                    orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }]
+                    dimensions: [
+                        { name: 'pagePath' },
+                        { name: 'pageTitle' }
+                    ],
+                    metrics: [
+                        { name: 'screenPageViews' },
+                        { name: 'sessions' }
+                    ],
+                    orderBys: [
+                        { metric: { metricName: 'screenPageViews' }, desc: true }
+                    ]
                 }
             }),
-
             analyticsData.properties.runReport({
                 property: `properties/${propertyId}`,
                 auth: authClient,
@@ -141,11 +143,12 @@ app.get('/dashboard-data', async (req, res) => {
                     dateRanges: [{ startDate, endDate }],
                     dimensions: [{ name: 'eventName' }],
                     metrics: [{ name: 'eventCount' }],
-                    orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }]
+                    orderBys: [
+                        { metric: { metricName: 'eventCount' }, desc: true }
+                    ]
                 }
             })
         ]);
-
         const dashboardData = {
             realtimeByCountry: realtimeCountry.data || {},
             realtimeByPages: realtimePages.data || {},
@@ -153,7 +156,6 @@ app.get('/dashboard-data', async (req, res) => {
             topEvents: topEvents.data || {},
             lastUpdated: new Date().toISOString()
         };
-
         res.json(dashboardData);
         console.log('Dashboard data sent');
     } catch (error) {
@@ -162,11 +164,11 @@ app.get('/dashboard-data', async (req, res) => {
     }
 });
 
+// ========== PAGE PERFORMANCE ==========
 app.get('/page-performance', async (req, res) => {
     try {
         const authClient = await auth.getClient();
         const { startDate = '7daysAgo', endDate = 'today' } = req.query;
-
         const response = await analyticsData.properties.runReport({
             property: `properties/${propertyId}`,
             auth: authClient,
@@ -184,14 +186,10 @@ app.get('/page-performance', async (req, res) => {
                     { name: 'bounceRate' }
                 ],
                 orderBys: [
-                    {
-                        metric: { metricName: 'screenPageViews' },
-                        desc: true
-                    }
+                    { metric: { metricName: 'screenPageViews' }, desc: true }
                 ]
             }
         });
-
         res.json(response.data || {});
         console.log('Page performance data sent');
     } catch (error) {
@@ -202,10 +200,4 @@ app.get('/page-performance', async (req, res) => {
 
 app.listen(port, () => {
     console.log(`🚀 Analytics Server running at http://localhost:${port}`);
-    console.log('📊 Available endpoints:');
-    console.log('   /realtime - Active users by country');
-    console.log('   /realtime-pages - Active users by page');
-    console.log('   /page-views - Page views historical data');
-    console.log('   /dashboard-data - Combined dashboard data');
-    console.log('   /page-performance - Detailed page performance metrics');
 });
